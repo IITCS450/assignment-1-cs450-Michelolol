@@ -11,10 +11,39 @@ int main(int c,char**v){
     char path[256];
     char line[256];
 
+    snprintf(path, sizeof(path), "proc/%s/status", pid);    //points to status folder (path)
+    FILE *status_f = fopen(path, "r");                      //creates a path for r
+    if(!status_f){
+        perror("Error opening status file");
+        return 1;
+    }
     
  
- 
- 
-    printf("TODO: implement procinfo\n");
+    while(fgets(line, sizeof(line), status_f)){
+        if(strncmp(line, "State:", 6) == 0) sscanf(line, "State: %s", state);
+        if(strncmp(line, "PPid:", 5) == 0) sscanf(line, "PPid: %d", state);
+        if(strncmp(line, "VmRSS:", 6) == 0) sscanf(line, "VmRSS: %d", state);
+    }
+    fclose(f)
+    printf("PID:%s\n", v[1]);
+    printf("State:%s\n", state);
+    printf("PPID:%d\n", ppid);
+
+    snprintf(path, sizeof(path), "proc/%s/cmdline", v[1]);    //points to cmdline folder (path)
+    f = fopen(path, "r");        
+    if (f){
+        printf("Cmd:");
+        int ch;
+        while ((ch = fgetc(f)) != EOF) putchar(ch == '\0' ? ' ' : ch);
+        printf("\n");
+        fclose(f);        
+    }
+
+    snprintf(path, sizeof(path), "proc/%s/stat", v[1]);    //points to stat folder (path)
+    f = fopen(path, "r");        
+    if (f){}
+
+
+
  return 0;
 }
