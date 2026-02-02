@@ -8,8 +8,8 @@ static double d(struct timespec a, struct timespec b){
  return (b.tv_sec-a.tv_sec)+(b.tv_nsec-a.tv_nsec)/1e9;}
 
 int main(int c,char**v){
-    if (argc < 2) 
-        usage(argv[0]);
+    if (c < 2) 
+        usage(v[0]);
     struct timespec start, end;
     pid_t pid;
     int status;
@@ -23,9 +23,9 @@ int main(int c,char**v){
         return 1;
     }
     else if (pid == 0){
-        if(execvp(arg[1], &argv[1]) == -1) { //checks for execvp failures
-            perror("execvp failed")
-            exit(1)
+        if(execvp(v[1], &v[1]) == -1) { //checks for execvp failures
+            perror("execvp failed");
+            exit(1);
         }
     }
     else{
@@ -33,16 +33,10 @@ int main(int c,char**v){
         clock_gettime(CLOCK_MONOTONIC, &end);
 
         if(WIFEXITED(status)){ 
-            printf("Child exited with status %d\n", WIFEXITSTATUS(status));
+            printf("Child exited with status %d\n", WEXITSTATUS(status));
         }
         printf("Elapsed Time: %.6f seconds\n", d(start, end));
     }
-
-
-
-
-
-    
 
     return 0;
 }
