@@ -31,12 +31,11 @@ int main(int c,char**v){
     else{
         waitpid(pid, &status, 0);           //waits for child to finish
         clock_gettime(CLOCK_MONOTONIC, &end);
-
-        if(WIFEXITED(status)){ 
-            printf("Child exited with status %d\n", WEXITSTATUS(status));
-        }
-        printf("Elapsed Time: %.6f seconds\n", d(start, end));
+        printf("pid=%d elapsed=%.3f exit=%d\n", 
+            pid, 
+            d(start, end), 
+            WIFEXITED(status) ? WEXITSTATUS(status) : -1);
     }
-
+    
     return 0;
 }
