@@ -8,23 +8,24 @@ int main(int c,char**v){
     if(c!=2||!isnum(v[1])) usage(v[0]);
  
     char *pid = v[1];
-    char path[256];
-    char line[256];
+    char path[256], line[256], state[64];
+    int ppid = 0, vmrss = 0;
 
     snprintf(path, sizeof(path), "proc/%s/status", pid);    //points to status folder (path)
-    FILE *status_f = fopen(path, "r");                      //creates a path for r
-    if(!status_f){
+    FILE *f = fopen(path, "r");                      //creates a path for r
+    if(!f){
         perror("Error opening status file");
         return 1;
     }
     
  
-    while(fgets(line, sizeof(line), status_f)){
+    while(fgets(line, sizeof(line), f)){
         if(strncmp(line, "State:", 6) == 0) sscanf(line, "State: %s", state);
-        if(strncmp(line, "PPid:", 5) == 0) sscanf(line, "PPid: %d", state);
-        if(strncmp(line, "VmRSS:", 6) == 0) sscanf(line, "VmRSS: %d", state);
+        if(strncmp(line, "PPid:", 5) == 0) sscanf(line, "PPid: %d", &ppid);
+        if(strncmp(line, "VmRSS:", 6) == 0) sscanf(line, "VmRSS: %d", &vmrss);
     }
-    fclose(f)
+    fclose(f);
+
     printf("PID:%s\n", v[1]);
     printf("State:%s\n", state);
     printf("PPID:%d\n", ppid);
@@ -41,9 +42,15 @@ int main(int c,char**v){
 
     snprintf(path, sizeof(path), "proc/%s/stat", v[1]);    //points to stat folder (path)
     f = fopen(path, "r");        
-    if (f){}
-
-
+    if (f){
+        unsigned long utime, stime;
+        if(fscanf(f, "%*d %*s %*c %*d %*d %*d %*d %*d %*u %*u %*u %*u %*u %lu %lu", &utime, &stime) == 2) {
+            long hz = sysconf(_SC_CLK_TCK);
+            printf("CPU:%.0f %.3f\n", (double)utime / hz, (double)stime / hz);
+        }   
+        fclose(f);
+    }
+    printf("VmRSS:%d\n", vmrss);
 
  return 0;
 }
